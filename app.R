@@ -9,16 +9,8 @@ cocktails <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/
 
 mytable<-function(x,y){
   filter(cocktails, category %in% x & alcoholic %in% y)%>%
-    select(drink, ingredient, measure, id_drink)
+    select(drink, ingredient, glass, measure, id_drink)
 }
-
-ggplot(cocktails, aes(x=category))+ geom_bar() +coord_flip()
-
-
-a<- ggplot(cocktails, aes(x = alcoholic, color = category)) +
-  geom_point(stat = "count", aes(y = ..count..))
-
-
 
 ui<-fluidPage(
   titlePanel("Cocktail Category"),
