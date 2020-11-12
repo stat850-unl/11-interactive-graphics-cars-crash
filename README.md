@@ -10,3 +10,6 @@ Use the [TidyTuesday Cocktail Data](https://github.com/rfordatascience/tidytuesd
 Your applet should make use of reactivity in both components, but the specifics of what you do and how you do it are up to you.
 
 Once you're satisfied with your applet, upload it to [ShinyApps.io](https://www.shinyapps.io/) and edit this README to contain a link to your applet.
+
+
+Link to the applet: (https://1606anhhuy.shinyapps.io/Cocktails/?_ga=2.134458099.348308503.1605208658-1722176505.1604444415)
