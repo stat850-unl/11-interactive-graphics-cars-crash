@@ -1,49 +1,76 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
+library(DT)
+library(dplyr)
+library(ggplot2)
 
-# Define UI for application that draws a histogram
-ui <- fluidPage(
+cocktails <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-26/cocktails.csv')
 
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
-)
-
-# Define server logic required to draw a histogram
-server <- function(input, output) {
-
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    })
+mytable<-function(x,y){
+   c<-filter(cocktails, category=="x" & alcoholic=="y")%>%
+        select(drink, ingredient, measure, id_drink)
+   print (c)
 }
 
-# Run the application 
+ggplot(cocktails, aes(x=category))+ geom_bar() +coord_flip()
+
+
+a<- ggplot(cocktails, aes(x = alcoholic, color = category)) + 
+    geom_point(stat = "count", aes(y = ..count..))
+
+
+
+ui<-fluidPage(
+    sidebarPanel(
+    titlePanel("Cocktail Category"),
+    
+    selectInput(inputId = "C", 
+                label="Pick a category",
+                choices=list("Beer",
+                             "Cofee/Tea",
+                             "Cocoa",
+                             "Cocktail",
+                             "Homemade Liquer",
+                             "Milk/Float/Shake",
+                             "Oridnary Drink",
+                             "Punch/Party Drink",
+                             "Soft Drink/Soda",
+                             "Shot",
+                             "Other/Unknown"),
+                selected ="Beer"),
+    
+    selectInput(inputId = "A",
+                label="Choose Alcoholic",
+                choices=list("Alcoholic",
+                             "Non Alcoholic",
+                             "Non alcoholic",
+                             "Optional alcohol",
+                             "NA"),
+                selected="Alcoholic")
+    ),
+    
+    mainPanel(plotOutput("myplot")
+              
+    )
+    
+)
+
+
+serve <-function(input, output){
+    mytable<-function(x,y){
+        c<-filter(cocktails, category=="x" & alcoholic=="y")%>%
+            select(drink, ingredient, measure, id_drink)
+        print (c)
+    }
+    
+    output$myplot <- renderPlot({ggplot(cocktails, aes(x = alcoholic, color = category)) + 
+            geom_point(stat = "count", aes(y = ..count..))})
+    
+    
+    output$table <- renderTable({
+    mytable(input$C, input$A)
+        })
+}
+
+
+
 shinyApp(ui = ui, server = server)
