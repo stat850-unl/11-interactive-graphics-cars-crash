@@ -23,7 +23,6 @@ a<- ggplot(cocktails, aes(x = alcoholic, color = category)) +
 ui<-fluidPage(
     titlePanel("Cocktail Category"),
     sidebarPanel(
-<<<<<<< HEAD
     selectInput(inputId = "Co", 
                 label="Choose a category",
                 choices=list("Beer",
