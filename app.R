@@ -22,7 +22,7 @@ a<- ggplot(cocktails, aes(x = alcoholic, color = category)) +
 ui<-fluidPage(
     titlePanel("Cocktail Category"),
     sidebarPanel(
-    selectInput(inputId = "C", 
+    selectInput(inputId = "Co", 
                 label="Choose a category",
                 choices=list("Beer",
                              "Cofee/Tea",
@@ -37,7 +37,7 @@ ui<-fluidPage(
                              "Other/Unknown"),
                 selected ="Beer"),
     
-    selectInput(inputId = "A",
+    selectInput(inputId = "Al",
                 label="Choose Alcoholic",
                 choices=list("Alcoholic",
                              "Non Alcoholic",
@@ -47,7 +47,9 @@ ui<-fluidPage(
                 selected="Alcoholic")
     ),
     
-    mainPanel(plotOutput("plot1")
+    mainPanel(plotOutput('plot1'),
+              dataTableOutput('table')
+              
               
     )
     
@@ -55,10 +57,12 @@ ui<-fluidPage(
 
 
 serve <-function(input, output){
-  
+    cocktails <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-26/cocktails.csv')
     output$plot1 <- renderPlot({
-        ggplot(cocktails(), aes(x=category))+ geom_bar() +coord_flip()},height = 400,width = 600)
-    
+        p <- ggplot(cocktails(), aes(x=category()))+ geom_bar() +coord_flip()
+        print (p)}, height=700)
+    c<-filter(cocktails, category== input$Co & alcoholic==input$Al)
+    output$table<-renderDataTable(c)
 }
 
 
