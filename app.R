@@ -2,19 +2,20 @@ library(shiny)
 library(DT)
 library(dplyr)
 library(ggplot2)
+library(stringr)
 
-cocktails <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-26/cocktails.csv')
+cocktails <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-05-26/cocktails.csv') %>%
+  mutate(alcoholic = str_replace(alcoholic, "alcohol", "Alcohol"))
 
 mytable<-function(x,y){
-   c<-filter(cocktails, category=="x" & alcoholic=="y")%>%
+   filter(cocktails, category %in% x & alcoholic %in% y)%>%
         select(drink, ingredient, measure, id_drink)
-   print (c)
 }
 
 ggplot(cocktails, aes(x=category))+ geom_bar() +coord_flip()
 
 
-a<- ggplot(cocktails, aes(x = alcoholic, color = category)) + 
+a<- ggplot(cocktails, aes(x = alcoholic, color = category)) +
     geom_point(stat = "count", aes(y = ..count..))
 
 
@@ -22,43 +23,34 @@ a<- ggplot(cocktails, aes(x = alcoholic, color = category)) +
 ui<-fluidPage(
     titlePanel("Cocktail Category"),
     sidebarPanel(
-    selectInput(inputId = "C", 
+    selectInput(inputId = "type",
                 label="Choose a category",
-                choices=list("Beer",
-                             "Cofee/Tea",
-                             "Cocoa",
-                             "Cocktail",
-                             "Homemade Liquer",
-                             "Milk/Float/Shake",
-                             "Oridnary Drink",
-                             "Punch/Party Drink",
-                             "Soft Drink/Soda",
-                             "Shot",
-                             "Other/Unknown"),
-                selected ="Beer"),
-    
-    selectInput(inputId = "A",
+                choices=unique(cocktails$category)),
+
+    selectInput(inputId = "alcohol",
                 label="Choose Alcoholic",
-                choices=list("Alcoholic",
-                             "Non Alcoholic",
-                             "Non alcoholic",
-                             "Optional alcohol",
-                             "NA"),
-                selected="Alcoholic")
+                choices=unique(cocktails$alcoholic))
     ),
-    
-    mainPanel(plotOutput("plot1")
-              
+
+    mainPanel(
+      plotOutput("plot1"),
+      tableOutput("tab1")
     )
-    
+
 )
 
 
-serve <-function(input, output){
-  
+server <-function(input, output){
+
     output$plot1 <- renderPlot({
-        ggplot(cocktails(), aes(x=category))+ geom_bar() +coord_flip()},height = 400,width = 600)
-    
+      cocktails %>%
+        mutate(selected = category %in% input$type & alcoholic %in% input$alcohol) %>%
+        ggplot(aes(x=category, fill = selected))+ geom_bar() +coord_flip()},height = 400,width = 600)
+
+    output$tab1 <- renderTable({
+      mytable(input$type, input$alcohol)
+    })
+
 }
 
 
