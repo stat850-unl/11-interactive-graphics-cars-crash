@@ -20,11 +20,10 @@ a<- ggplot(cocktails, aes(x = alcoholic, color = category)) +
 
 
 ui<-fluidPage(
-    sidebarPanel(
     titlePanel("Cocktail Category"),
-    
+    sidebarPanel(
     selectInput(inputId = "C", 
-                label="Pick a category",
+                label="Choose a category",
                 choices=list("Beer",
                              "Cofee/Tea",
                              "Cocoa",
@@ -48,7 +47,7 @@ ui<-fluidPage(
                 selected="Alcoholic")
     ),
     
-    mainPanel(plotOutput("myplot")
+    mainPanel(plotOutput("plot1")
               
     )
     
@@ -56,19 +55,10 @@ ui<-fluidPage(
 
 
 serve <-function(input, output){
-    mytable<-function(x,y){
-        c<-filter(cocktails, category=="x" & alcoholic=="y")%>%
-            select(drink, ingredient, measure, id_drink)
-        print (c)
-    }
+  
+    output$plot1 <- renderPlot({
+        ggplot(cocktails(), aes(x=category))+ geom_bar() +coord_flip()},height = 400,width = 600)
     
-    output$myplot <- renderPlot({ggplot(cocktails, aes(x = alcoholic, color = category)) + 
-            geom_point(stat = "count", aes(y = ..count..))})
-    
-    
-    output$table <- renderTable({
-    mytable(input$C, input$A)
-        })
 }
 
 
